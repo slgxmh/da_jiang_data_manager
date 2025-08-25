@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:da_jiang_data_manager/common/dataset.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 
 /// 工作空间文件的扩展名
 const workspaceExt = "djmw";
@@ -13,9 +14,16 @@ class WorkspaceController extends GetxController {
   /// 当前工作空间文件的路径
   final RxString filePath = ''.obs;
 
-  /// 工作空间中存储的数据
+  //  ----- 工作空间中存储的数据 -----
+  /// MRK文件路径列表
   final mrkPaths = <String>[];
+
+  /// MRK数据列表，对应MRK数据列表
   final mrkDatas = <MrkData>[];
+
+  // ----- 工作空间用到的数据，无需存储 -----
+  /// 工作空间中地图的初始中心点，北京天安门
+  LatLng centerPoint = LatLng(39.909187, 116.397451);
 
   /// 判断当前是否有工作空间处于打开状态
   bool get isWorkspaceOpen => filePath.value.isNotEmpty;
@@ -55,6 +63,8 @@ class WorkspaceController extends GetxController {
     for (final path in mrkPaths) {
       mrkDatas.add(MrkData.fromMrkFile(path));
     }
+    _computeCenterPoint();
+
     update();
   }
 
@@ -105,7 +115,19 @@ class WorkspaceController extends GetxController {
     String path = result.files.single.path!;
     mrkPaths.add(path);
     mrkDatas.add(MrkData.fromMrkFile(path));
+
+    _computeCenterPoint();
+
     update();
+  }
+
+  /// 获取中心点
+  void _computeCenterPoint() {
+    final points = mrkDatas.map((e) => e.centerPoint).toList();
+    final sumLat = points.fold(0.0, (sum, item) => sum + item.latitude);
+    final sumLon = points.fold(0.0, (sum, item) => sum + item.longitude);
+    var point = LatLng(sumLat / points.length, sumLon / points.length);
+    centerPoint = point;
   }
 
   /// 重置工作空间

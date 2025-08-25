@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:latlong2/latlong.dart';
+
 // ------------------ 常量 ------------------
 const String imgRGBBandName = "D";
 const String imgGBandName = "G";
@@ -63,5 +65,13 @@ class MrkData {
     }
 
     return MrkData(basePath: basePath, items: items);
+  }
+
+  /// 获取中心点
+  LatLng get centerPoint {
+    if (items.isEmpty) return LatLng(0, 0);
+    final sumLat = items.fold(0.0, (sum, item) => sum + item.lat);
+    final sumLon = items.fold(0.0, (sum, item) => sum + item.lon);
+    return LatLng(sumLat / items.length, sumLon / items.length);
   }
 }
