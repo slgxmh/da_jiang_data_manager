@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:da_jiang_data_manager/common/dataset.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:get/get.dart';
 
@@ -6,17 +10,17 @@ const workspaceExt = "djmw";
 
 /// 工作空间控制器，用于管理工作区的创建、打开、保存等操作
 class WorkspaceController extends GetxController {
-  /// 当前工作空间文件的路径，使用.obs使其成为响应式变量
+  /// 当前工作空间文件的路径
   final RxString filePath = ''.obs;
 
-  /// 工作空间中存储的数据，使用.obs使其成为响应式变量
-  final RxList<String> _mrkPaths = <String>[].obs;
+  /// 工作空间中存储的数据
+  final mrkPaths = <String>[];
+  final mrkDatas = <MrkData>[];
 
   /// 判断当前是否有工作空间处于打开状态
   bool get isWorkspaceOpen => filePath.value.isNotEmpty;
 
   /// 创建一个新的工作空间
-  ///
   /// 可以通过[fileName]参数指定默认的文件名
   void createWorkspace({String fileName = 'new_workspace'}) async {
     // 弹出文件保存对话框，让用户选择保存位置和文件名
@@ -28,7 +32,7 @@ class WorkspaceController extends GetxController {
     // 如果用户选择了文件路径
     if (outputFile != null) {
       filePath.value = outputFile; // 更新文件路径
-      _mrkPaths.clear();
+      _resetWorkspace();
       saveWorkspace(); // 保存新的空工作空间
     }
   }
@@ -40,26 +44,31 @@ class WorkspaceController extends GetxController {
       type: FileType.custom,
       allowedExtensions: [workspaceExt], // 只允许选择.djmw文件
     );
+    if (result == null) return;
 
-    // 如果用户选择了文件
-    if (result != null) {
-      filePath.value = result.files.single.path!; // 更新文件路径
-      // final file = File(filePath.value);
-      // final contents = await file.readAsString(); // 读取文件内容
+    filePath.value = result.files.single.path!; // 更新文件路径
+    final file = File(filePath.value);
+    final contents = await file.readAsString(); // 读取文件内容
+    _fromJson(contents); // 从JSON中恢复数据
+
+    // 加载MRK数据
+    for (final path in mrkPaths) {
+      mrkDatas.add(MrkData.fromMrkFile(path));
     }
+    update();
   }
 
   /// 保存当前工作空间
   void saveWorkspace() {
     // 确保有工作空间已打开
-    // if (isWorkspaceOpen) {
-    //   final file = File(filePath.value);
-    //   // 将数据转换为JSON字符串并写入文件
-    //   file.writeAsStringSync(jsonEncode(_data));
-    // } else {
-    //   // 如果当前没有打开的工作空间（比如新建的），则调用“另存为”
-    //   saveAsWorkspace();
-    // }
+    if (isWorkspaceOpen) {
+      final file = File(filePath.value);
+      // 将数据转换为JSON字符串并写入文件
+      file.writeAsStringSync(_toJson());
+    } else {
+      // 如果当前没有打开的工作空间（比如新建的），则调用“另存为”
+      saveAsWorkspace();
+    }
   }
 
   /// 将当前工作空间另存为
@@ -80,7 +89,8 @@ class WorkspaceController extends GetxController {
   /// 关闭当前工作空间
   void closeWorkspace() {
     filePath.value = ''; // 清空文件路径
-    _mrkPaths.clear(); // 清空数据
+    _resetWorkspace();
+    update();
   }
 
   /// 添加MRK数据
@@ -90,14 +100,27 @@ class WorkspaceController extends GetxController {
       type: FileType.custom,
       allowedExtensions: [".MRK"], // 只允许选择.MRK文件
     );
-    if (result != null) {
-      String path = result.files.single.path!;
-      _mrkPaths.add(path);
-    }
+    if (result == null) return;
+
+    String path = result.files.single.path!;
+    mrkPaths.add(path);
+    mrkDatas.add(MrkData.fromMrkFile(path));
+    update();
   }
 
-  /// 读取MRK文件列表
-  List<String> getMrkPaths() {
-    return _mrkPaths;
+  /// 重置工作空间
+  void _resetWorkspace() {
+    mrkPaths.clear();
+    mrkDatas.clear();
+    update();
+  }
+
+  String _toJson() {
+    return jsonEncode({"mrkPaths": mrkPaths});
+  }
+
+  void _fromJson(String json) {
+    Map<String, dynamic> data = jsonDecode(json);
+    mrkPaths.addAll(List<String>.from(data["mrkPaths"]));
   }
 }

@@ -11,15 +11,15 @@ class DatasetViewer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(
-      () => ListView.builder(
-        itemCount: workspaceController.getMrkPaths().length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(workspaceController.getMrkPaths()[index]),
-          );
-        },
-      ),
+    return GetBuilder<WorkspaceController>(
+      builder: (controller) {
+        return ListView.builder(
+          itemCount: controller.mrkPaths.length,
+          itemBuilder: (context, index) {
+            return ListTile(title: Text(controller.mrkPaths[index]));
+          },
+        );
+      },
     );
   }
 }
