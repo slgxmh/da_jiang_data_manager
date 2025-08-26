@@ -17,6 +17,7 @@ class Messages extends Translations {
       'project_close': '关闭项目',
       'data': '数据',
       'data_add_mrk': '添加MRK',
+      'data_viewer_no_data': "请添加MRK数据",
     },
     'en_US': {
       'app_name': 'DaJiangDataManager',
@@ -31,6 +32,7 @@ class Messages extends Translations {
       'project_close': 'Close Project',
       'data': "Data",
       'data_add_mrk': 'Add MRK',
+      'data_viewer_no_data': "Please add MRK data",
     },
   };
 }
