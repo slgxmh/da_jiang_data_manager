@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "数据集",
+                                  "dataset".tr,
                                   style: Theme.of(
                                     context,
                                   ).textTheme.titleMedium,
