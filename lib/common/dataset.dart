@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:latlong2/latlong.dart';
+import 'package:path/path.dart' as p;
 
 // ------------------ 常量 ------------------
 const String imgRGBBandName = "D";
@@ -73,5 +74,10 @@ class MrkData {
     final sumLat = items.fold(0.0, (sum, item) => sum + item.lat);
     final sumLon = items.fold(0.0, (sum, item) => sum + item.lon);
     return LatLng(sumLat / items.length, sumLon / items.length);
+  }
+
+  /// 获取图片的路径
+  String getImgPath(String bandName) {
+    return p.join(basePath, "img_${bandName}_${p.basename(basePath)}.tif");
   }
 }

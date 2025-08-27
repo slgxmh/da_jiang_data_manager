@@ -13,11 +13,30 @@ class AppMap extends StatefulWidget {
 
 class _AppMapState extends State<AppMap> {
   final _mapController = MapController();
+  final _controller = Get.find<WorkspaceController>();
+  Worker? _centerPointWorker;
   bool _isMapReady = false;
 
-  List<Marker> _buildMarkers(WorkspaceController controller) {
+  @override
+  void initState() {
+    super.initState();
+    _centerPointWorker = ever(_controller.centerPoint, (center) {
+      if (_isMapReady) {
+        _mapController.move(center, _mapController.camera.zoom);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _centerPointWorker?.dispose();
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  List<Marker> _buildMarkers() {
     final markers = <Marker>[];
-    for (final mrkData in controller.mrkDatas) {
+    for (final mrkData in _controller.mrkDatas) {
       for (final item in mrkData.items) {
         markers.add(
           Marker(
@@ -36,36 +55,31 @@ class _AppMapState extends State<AppMap> {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<WorkspaceController>(
-      builder: (controller) {
-        if (_isMapReady &&
-            _mapController.camera.center != controller.centerPoint) {
-          _mapController.move(
-            controller.centerPoint,
-            _mapController.camera.zoom,
-          );
-        }
-        return FlutterMap(
-          mapController: _mapController,
-          options: MapOptions(
-            initialCenter: controller.centerPoint,
-            initialZoom: 10,
-            onMapReady: () {
-              _isMapReady = true;
-            },
+    return FlutterMap(
+      mapController: _mapController,
+      options: MapOptions(
+        initialCenter: _controller.centerPoint.value,
+        initialZoom: 10,
+        onMapReady: () {
+          _isMapReady = true;
+          if (_mapController.camera.center != _controller.centerPoint.value) {
+            _mapController.move(
+                _controller.centerPoint.value, _mapController.camera.zoom);
+          }
+        },
+      ),
+      children: [
+        TileLayer(
+          urlTemplate:
+              'https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&style=8&x={x}&y={y}&z={z}',
+          subdomains: const ['1', '2', '3', '4'],
+        ),
+        Obx(
+          () => MarkerLayer(
+            markers: _buildMarkers(),
           ),
-          children: [
-            TileLayer(
-              urlTemplate:
-                  'https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&style=8&x={x}&y={y}&z={z}',
-              subdomains: const ['1', '2', '3', '4'],
-            ),
-            MarkerLayer(
-              markers: _buildMarkers(controller),
-            )
-          ],
-        );
-      },
+        )
+      ],
     );
   }
 }

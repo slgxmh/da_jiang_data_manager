@@ -18,6 +18,7 @@ class Messages extends Translations {
       'data': '数据',
       'data_add_mrk': '添加MRK',
       'data_viewer_no_data': "请添加MRK数据",
+      'data_viewer_no_selected_mrk': "请选择MRK数据",
       'dataset': '数据集',
     },
     'en_US': {
@@ -34,6 +35,7 @@ class Messages extends Translations {
       'data': "Data",
       'data_add_mrk': 'Add MRK',
       'data_viewer_no_data': "Please add MRK data",
+      'data_viewer_no_selected_mrk': "Please select a MRK",
       'dataset': 'Dataset',
     },
   };

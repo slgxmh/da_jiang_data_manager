@@ -9,24 +9,36 @@ import 'package:latlong2/latlong.dart';
 /// 工作空间文件的扩展名
 const workspaceExt = "djmw";
 
+/// 天安门的经纬度
+const tianAnMeng = LatLng(39.909187, 116.397451);
+
 /// 工作空间控制器，用于管理工作区的创建、打开、保存等操作
 class WorkspaceController extends GetxController {
+  // ----- 工作空间用到的数据，无需存储 -----
+  /// 工作空间中地图的初始中心点，北京天安门
+  final Rx<LatLng> centerPoint = tianAnMeng.obs;
+
   /// 当前工作空间文件的路径
   final RxString filePath = ''.obs;
 
+  /// 当前选中的mrk index
+  final RxInt selectedMrkIndex = (-1).obs;
+
+  /// 当前选中的图片 index
+  final RxInt selectedImgIndex = (-1).obs;
+
   //  ----- 工作空间中存储的数据 -----
   /// MRK文件路径列表
-  final mrkPaths = <String>[];
+  final RxList<String> mrkPaths = <String>[].obs;
 
   /// MRK数据列表，对应MRK数据列表
-  final mrkDatas = <MrkData>[];
-
-  // ----- 工作空间用到的数据，无需存储 -----
-  /// 工作空间中地图的初始中心点，北京天安门
-  LatLng centerPoint = LatLng(39.909187, 116.397451);
+  final RxList<MrkData> mrkDatas = <MrkData>[].obs;
 
   /// 判断当前是否有工作空间处于打开状态
   bool get isWorkspaceOpen => filePath.value.isNotEmpty;
+
+  /// 是否选中了mrk
+  bool get isMrkSelected => selectedMrkIndex.value >= 0;
 
   /// 创建一个新的工作空间
   /// 可以通过[fileName]参数指定默认的文件名
@@ -63,9 +75,12 @@ class WorkspaceController extends GetxController {
     for (final path in mrkPaths) {
       mrkDatas.add(MrkData.fromMrkFile(path));
     }
-    _computeCenterPoint();
 
-    update();
+    // 如果有MRK数据
+    if (mrkDatas.isNotEmpty) {
+      selectedMrkIndex.value = 0; // 默认选中第一个MRK
+      _computeCenterPoint();
+    }
   }
 
   /// 保存当前工作空间
@@ -100,7 +115,6 @@ class WorkspaceController extends GetxController {
   void closeWorkspace() {
     filePath.value = ''; // 清空文件路径
     _resetWorkspace();
-    update();
   }
 
   /// 添加MRK数据
@@ -117,8 +131,6 @@ class WorkspaceController extends GetxController {
     mrkDatas.add(MrkData.fromMrkFile(path));
 
     _computeCenterPoint();
-
-    update();
   }
 
   /// 获取中心点
@@ -127,14 +139,17 @@ class WorkspaceController extends GetxController {
     final sumLat = points.fold(0.0, (sum, item) => sum + item.latitude);
     final sumLon = points.fold(0.0, (sum, item) => sum + item.longitude);
     var point = LatLng(sumLat / points.length, sumLon / points.length);
-    centerPoint = point;
+    centerPoint.value = point;
   }
 
   /// 重置工作空间
   void _resetWorkspace() {
     mrkPaths.clear();
     mrkDatas.clear();
-    update();
+    selectedMrkIndex.value = -1;
+    selectedImgIndex.value = -1;
+    centerPoint.value = tianAnMeng;
+    ;
   }
 
   String _toJson() {
