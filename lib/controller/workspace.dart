@@ -131,6 +131,12 @@ class WorkspaceController extends GetxController {
     mrkDatas.add(MrkData.fromMrkFile(path));
 
     _computeCenterPoint();
+
+    // 如果有MRK数据
+    if (mrkDatas.isNotEmpty) {
+      selectedMrkIndex.value = 0; // 默认选中第一个MRK
+      _computeCenterPoint();
+    }
   }
 
   /// 获取中心点
