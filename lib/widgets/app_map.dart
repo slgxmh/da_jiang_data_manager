@@ -36,15 +36,16 @@ class _AppMapState extends State<AppMap> {
 
   List<Marker> _buildMarkers() {
     final markers = <Marker>[];
-    for (final mrkData in _controller.mrkDatas) {
-      for (final item in mrkData.items) {
+    if (_controller.isMrkSelected) {
+      for (final item
+          in _controller.mrkDatas[_controller.selectedMrkIndex.value].items) {
         markers.add(
           Marker(
             point: LatLng(item.lat, item.lon),
             child: Icon(
               Icons.location_on,
               color: Colors.red,
-              key: Key('mrk_item_${mrkData.basePath}_${item.id}'),
+              key: Key('mrk_item_${item.id}'),
             ),
           ),
         );
@@ -64,7 +65,9 @@ class _AppMapState extends State<AppMap> {
           _isMapReady = true;
           if (_mapController.camera.center != _controller.centerPoint.value) {
             _mapController.move(
-                _controller.centerPoint.value, _mapController.camera.zoom);
+              _controller.centerPoint.value,
+              _mapController.camera.zoom,
+            );
           }
         },
       ),
@@ -74,11 +77,7 @@ class _AppMapState extends State<AppMap> {
               'https://wprd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&style=8&x={x}&y={y}&z={z}',
           subdomains: const ['1', '2', '3', '4'],
         ),
-        Obx(
-          () => MarkerLayer(
-            markers: _buildMarkers(),
-          ),
-        )
+        Obx(() => MarkerLayer(markers: _buildMarkers())),
       ],
     );
   }
