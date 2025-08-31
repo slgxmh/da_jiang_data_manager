@@ -122,7 +122,7 @@ class WorkspaceController extends GetxController {
     // 弹出文件选择对话框
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: [".MRK"], // 只允许选择.MRK文件
+      allowedExtensions: ["MRK"], // 只允许选择.MRK文件
     );
     if (result == null) return;
 
