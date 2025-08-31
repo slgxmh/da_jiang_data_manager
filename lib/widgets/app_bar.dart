@@ -90,14 +90,14 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                 PopupMenuItem(
                   value: 'add_mrk',
                   enabled: workspaceController.isWorkspaceOpen,
-                  child: Text('添加MRK'),
+                  child: Text('data_add_mrk'.tr),
                 ),
               ];
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text('数据', style: TextStyle(fontSize: fontSize)),
+                Text('data'.tr, style: TextStyle(fontSize: fontSize)),
                 const Icon(Icons.arrow_drop_down),
               ],
             ),
