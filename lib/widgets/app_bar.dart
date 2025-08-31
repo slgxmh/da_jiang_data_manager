@@ -16,106 +16,108 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       leadingWidth: 240,
-      leading: Flex(
-        direction: Axis.horizontal,
-        spacing: 10,
-        children: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              switch (value) {
-                case 'new':
-                  workspaceController.createWorkspace();
-                  break;
-                case 'open':
-                  workspaceController.openWorkspace();
-                  break;
-                case 'save':
-                  workspaceController.saveWorkspace();
-                  break;
-                case 'save_as':
-                  workspaceController.saveAsWorkspace();
-                  break;
-                case 'close':
-                  workspaceController.closeWorkspace();
-                  break;
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem(
-                  value: 'new',
-                  enabled: !workspaceController.isWorkspaceOpen,
-                  child: Text('project_new'.tr),
-                ),
-                PopupMenuItem(
-                  value: 'open',
-                  enabled: !workspaceController.isWorkspaceOpen,
-                  child: Text('project_open'.tr),
-                ),
-                const PopupMenuDivider(),
-                PopupMenuItem(
-                  value: 'save',
-                  enabled: workspaceController.isWorkspaceOpen,
-                  child: Text('project_save'.tr),
-                ),
-                PopupMenuItem(
-                  value: 'save_as',
-                  enabled: workspaceController.isWorkspaceOpen,
-                  child: Text('project_save_as'.tr),
-                ),
-                const PopupMenuDivider(),
-                PopupMenuItem(
-                  value: 'close',
-                  enabled: workspaceController.isWorkspaceOpen,
-                  child: Text('project_close'.tr),
-                ),
-              ];
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text('project'.tr, style: TextStyle(fontSize: fontSize)),
-                const Icon(Icons.arrow_drop_down),
-              ],
+      leading: GetBuilder<WorkspaceController>(
+        builder: (controller) => Flex(
+          direction: Axis.horizontal,
+          spacing: 10,
+          children: [
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                switch (value) {
+                  case 'new':
+                    controller.createWorkspace();
+                    break;
+                  case 'open':
+                    controller.openWorkspace();
+                    break;
+                  case 'save':
+                    controller.saveWorkspace();
+                    break;
+                  case 'save_as':
+                    controller.saveAsWorkspace();
+                    break;
+                  case 'close':
+                    controller.closeWorkspace();
+                    break;
+                }
+              },
+              itemBuilder: (BuildContext context) {
+                return [
+                  PopupMenuItem(
+                    value: 'new',
+                    enabled: !controller.isWorkspaceOpen,
+                    child: Text('project_new'.tr),
+                  ),
+                  PopupMenuItem(
+                    value: 'open',
+                    enabled: !controller.isWorkspaceOpen,
+                    child: Text('project_open'.tr),
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'save',
+                    enabled: controller.isWorkspaceOpen,
+                    child: Text('project_save'.tr),
+                  ),
+                  PopupMenuItem(
+                    value: 'save_as',
+                    enabled: controller.isWorkspaceOpen,
+                    child: Text('project_save_as'.tr),
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    value: 'close',
+                    enabled: controller.isWorkspaceOpen,
+                    child: Text('project_close'.tr),
+                  ),
+                ];
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text('project'.tr, style: TextStyle(fontSize: fontSize)),
+                  const Icon(Icons.arrow_drop_down),
+                ],
+              ),
             ),
-          ),
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'data_add_mrk') {
-                workspaceController.addMrk();
-              }
-              if (value == 'data_remove_mrk') {
-                workspaceController.removeCurrentMrk();
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem(
-                  value: 'data_add_mrk',
-                  enabled: workspaceController.isWorkspaceOpen,
-                  child: Text('data_add_mrk'.tr),
-                ),
-                PopupMenuItem(
-                  value: 'data_remove_mrk',
-                  enabled: workspaceController.isWorkspaceOpen,
-                  child: Text('data_remove_mrk'.tr),
-                ),
-              ];
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text('data'.tr, style: TextStyle(fontSize: fontSize)),
-                const Icon(Icons.arrow_drop_down),
-              ],
+            PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'data_add_mrk') {
+                  controller.addMrk();
+                }
+                if (value == 'data_remove_mrk') {
+                  controller.removeCurrentMrk();
+                }
+              },
+              itemBuilder: (BuildContext context) {
+                return [
+                  PopupMenuItem(
+                    value: 'data_add_mrk',
+                    enabled: controller.isWorkspaceOpen,
+                    child: Text('data_add_mrk'.tr),
+                  ),
+                  PopupMenuItem(
+                    value: 'data_remove_mrk',
+                    enabled: controller.isWorkspaceOpen,
+                    child: Text('data_remove_mrk'.tr),
+                  ),
+                ];
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text('data'.tr, style: TextStyle(fontSize: fontSize)),
+                  const Icon(Icons.arrow_drop_down),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-      title: Obx(
-        () => Text(
-          workspaceController.isWorkspaceOpen
-              ? workspaceController.filePath.value.split("/").last
+      title: GetBuilder<WorkspaceController>(
+        builder: (controller) => Text(
+          controller.isWorkspaceOpen
+              ? controller.filePath.split("/").last
               : 'app_name'.tr,
         ),
       ),

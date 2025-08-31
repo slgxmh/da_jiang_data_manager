@@ -16,29 +16,29 @@ const tianAnMeng = LatLng(39.909187, 116.397451);
 class WorkspaceController extends GetxController {
   // ----- 工作空间用到的数据，无需存储 -----
   /// 工作空间中地图的初始中心点，北京天安门
-  final Rx<LatLng> centerPoint = tianAnMeng.obs;
+  LatLng centerPoint = tianAnMeng;
 
   /// 当前工作空间文件的路径
-  final RxString filePath = ''.obs;
+  String filePath = '';
 
   /// 当前选中的mrk index
-  final RxInt selectedMrkIndex = (-1).obs;
+  int selectedMrkIndex = -1;
 
   /// 当前选中的图片 index
-  final RxInt selectedImgIndex = (-1).obs;
+  int selectedImgIndex = -1;
 
   //  ----- 工作空间中存储的数据 -----
   /// MRK文件路径列表
-  final RxList<String> mrkPaths = <String>[].obs;
+  List<String> mrkPaths = <String>[];
 
   /// MRK数据列表，对应MRK数据列表
-  final RxList<MrkData> mrkDatas = <MrkData>[].obs;
+  List<MrkData> mrkDatas = <MrkData>[];
 
   /// 判断当前是否有工作空间处于打开状态
-  bool get isWorkspaceOpen => filePath.value.isNotEmpty;
+  bool get isWorkspaceOpen => filePath.isNotEmpty;
 
   /// 是否选中了mrk
-  bool get isMrkSelected => selectedMrkIndex.value >= 0;
+  bool get isMrkSelected => selectedMrkIndex >= 0;
 
   /// 创建一个新的工作空间
   /// 可以通过[fileName]参数指定默认的文件名
@@ -51,9 +51,10 @@ class WorkspaceController extends GetxController {
 
     // 如果用户选择了文件路径
     if (outputFile != null) {
-      filePath.value = outputFile; // 更新文件路径
+      filePath = outputFile; // 更新文件路径
       _resetWorkspace();
       saveWorkspace(); // 保存新的空工作空间
+      update();
     }
   }
 
@@ -66,8 +67,8 @@ class WorkspaceController extends GetxController {
     );
     if (result == null) return;
 
-    filePath.value = result.files.single.path!; // 更新文件路径
-    final file = File(filePath.value);
+    filePath = result.files.single.path!; // 更新文件路径
+    final file = File(filePath);
     final contents = await file.readAsString(); // 读取文件内容
     _fromJson(contents); // 从JSON中恢复数据
 
@@ -78,16 +79,17 @@ class WorkspaceController extends GetxController {
 
     // 如果有MRK数据
     if (mrkDatas.isNotEmpty) {
-      selectedMrkIndex.value = 0; // 默认选中第一个MRK
+      selectedMrkIndex = 0; // 默认选中第一个MRK
       _computeCenterPoint();
     }
+    update();
   }
 
   /// 保存当前工作空间
   void saveWorkspace() {
     // 确保有工作空间已打开
     if (isWorkspaceOpen) {
-      final file = File(filePath.value);
+      final file = File(filePath);
       // 将数据转换为JSON字符串并写入文件
       file.writeAsStringSync(_toJson());
     } else {
@@ -106,15 +108,17 @@ class WorkspaceController extends GetxController {
 
     // 如果用户选择了路径
     if (outputFile != null) {
-      filePath.value = outputFile; // 更新文件路径
+      filePath = outputFile; // 更新文件路径
       saveWorkspace(); // 保存工作空间
+      update();
     }
   }
 
   /// 关闭当前工作空间
   void closeWorkspace() {
-    filePath.value = ''; // 清空文件路径
+    filePath = ''; // 清空文件路径
     _resetWorkspace();
+    update();
   }
 
   /// 添加MRK数据
@@ -134,18 +138,20 @@ class WorkspaceController extends GetxController {
 
     // 如果有MRK数据
     if (mrkDatas.isNotEmpty) {
-      selectedMrkIndex.value = 0; // 默认选中第一个MRK
+      selectedMrkIndex = 0; // 默认选中第一个MRK
       _computeCenterPoint();
     }
+    update();
   }
 
   /// 删除当前选中的MRK
   void removeCurrentMrk() {
     if (isMrkSelected) {
-      mrkDatas.removeAt(selectedMrkIndex.value);
-      var newIndex = selectedMrkIndex.value - 1;
+      mrkDatas.removeAt(selectedMrkIndex);
+      var newIndex = selectedMrkIndex - 1;
       if (mrkDatas.length == 1) newIndex = -1;
-      selectedMrkIndex.value = newIndex;
+      selectedMrkIndex = newIndex;
+      update();
     }
   }
 
@@ -155,16 +161,16 @@ class WorkspaceController extends GetxController {
     final sumLat = points.fold(0.0, (sum, item) => sum + item.latitude);
     final sumLon = points.fold(0.0, (sum, item) => sum + item.longitude);
     var point = LatLng(sumLat / points.length, sumLon / points.length);
-    centerPoint.value = point;
+    centerPoint = point;
   }
 
   /// 重置工作空间
   void _resetWorkspace() {
     mrkPaths.clear();
     mrkDatas.clear();
-    selectedMrkIndex.value = -1;
-    selectedImgIndex.value = -1;
-    centerPoint.value = tianAnMeng;
+    selectedMrkIndex = -1;
+    selectedImgIndex = -1;
+    centerPoint = tianAnMeng;
     ;
   }
 
