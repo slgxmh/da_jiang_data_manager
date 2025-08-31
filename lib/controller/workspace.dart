@@ -147,9 +147,11 @@ class WorkspaceController extends GetxController {
   /// 删除当前选中的MRK
   void removeCurrentMrk() {
     if (isMrkSelected) {
-      mrkDatas.removeAt(selectedMrkIndex);
       var newIndex = selectedMrkIndex - 1;
       if (mrkDatas.length == 1) newIndex = -1;
+
+      mrkDatas.removeAt(selectedMrkIndex);
+      mrkPaths.removeAt(selectedMrkIndex);
       selectedMrkIndex = newIndex;
       update();
     }
@@ -171,7 +173,6 @@ class WorkspaceController extends GetxController {
     selectedMrkIndex = -1;
     selectedImgIndex = -1;
     centerPoint = tianAnMeng;
-    ;
   }
 
   String _toJson() {
