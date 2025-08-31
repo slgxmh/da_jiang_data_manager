@@ -81,16 +81,24 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
-              if (value == 'add_mrk') {
+              if (value == 'data_add_mrk') {
                 workspaceController.addMrk();
+              }
+              if (value == 'data_remove_mrk') {
+                workspaceController.removeCurrentMrk();
               }
             },
             itemBuilder: (BuildContext context) {
               return [
                 PopupMenuItem(
-                  value: 'add_mrk',
+                  value: 'data_add_mrk',
                   enabled: workspaceController.isWorkspaceOpen,
                   child: Text('data_add_mrk'.tr),
+                ),
+                PopupMenuItem(
+                  value: 'data_remove_mrk',
+                  enabled: workspaceController.isWorkspaceOpen,
+                  child: Text('data_remove_mrk'.tr),
                 ),
               ];
             },

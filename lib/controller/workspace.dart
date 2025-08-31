@@ -139,6 +139,16 @@ class WorkspaceController extends GetxController {
     }
   }
 
+  /// 删除当前选中的MRK
+  void removeCurrentMrk() {
+    if (isMrkSelected) {
+      mrkDatas.removeAt(selectedMrkIndex.value);
+      var newIndex = selectedMrkIndex.value - 1;
+      if (mrkDatas.length == 1) newIndex = -1;
+      selectedMrkIndex.value = newIndex;
+    }
+  }
+
   /// 获取中心点
   void _computeCenterPoint() {
     final points = mrkDatas.map((e) => e.centerPoint).toList();
