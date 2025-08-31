@@ -13,6 +13,7 @@ class AppMap extends StatefulWidget {
 
 class _AppMapState extends State<AppMap> {
   final _mapController = MapController();
+  bool _isMapReady = false;
 
   @override
   void dispose() {
@@ -44,12 +45,19 @@ class _AppMapState extends State<AppMap> {
   Widget build(BuildContext context) {
     return GetBuilder<WorkspaceController>(
       builder: (controller) {
+        if (_isMapReady &&
+            _mapController.camera.center != controller.centerPoint) {
+          _mapController.move(controller.centerPoint, _mapController.camera.zoom);
+        }
         return FlutterMap(
           mapController: _mapController,
           options: MapOptions(
             initialCenter: controller.centerPoint,
             initialZoom: 10,
             onMapReady: () {
+              setState(() {
+                _isMapReady = true;
+              });
               if (_mapController.camera.center != controller.centerPoint) {
                 _mapController.move(
                   controller.centerPoint,
@@ -71,3 +79,4 @@ class _AppMapState extends State<AppMap> {
     );
   }
 }
+

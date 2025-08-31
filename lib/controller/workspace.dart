@@ -134,13 +134,12 @@ class WorkspaceController extends GetxController {
     mrkPaths.add(path);
     mrkDatas.add(MrkData.fromMrkFile(path));
 
-    _computeCenterPoint();
-
     // 如果有MRK数据
     if (mrkDatas.isNotEmpty) {
       selectedMrkIndex = 0; // 默认选中第一个MRK
-      _computeCenterPoint();
     }
+
+    _computeCenterPoint();
     update();
   }
 
@@ -159,6 +158,11 @@ class WorkspaceController extends GetxController {
 
   /// 获取中心点
   void _computeCenterPoint() {
+    if (mrkDatas.isEmpty) {
+      centerPoint = tianAnMeng;
+      return;
+    }
+
     final points = mrkDatas.map((e) => e.centerPoint).toList();
     final sumLat = points.fold(0.0, (sum, item) => sum + item.latitude);
     final sumLon = points.fold(0.0, (sum, item) => sum + item.longitude);
