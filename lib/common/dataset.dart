@@ -40,7 +40,12 @@ class MrkData {
   final String basePath;
   final List<MrkItem> items;
 
-  MrkData({required this.basePath, required this.items});
+  late final String _taskName;
+
+  MrkData({required this.basePath, required this.items}) {
+    var basename = p.basename(basePath);
+    _taskName = basename.substring(0, basename.length - 4);
+  }
 
   factory MrkData.fromMrkFile(String path) {
     final file = File(path);
@@ -77,7 +82,7 @@ class MrkData {
   }
 
   /// 获取图片的路径
-  String getImgPath(String bandName) {
-    return p.join(basePath, "img_${bandName}_${p.basename(basePath)}.tif");
+  String getDImgPath() {
+    return p.join(basePath, "${_taskName}_D.JPG");
   }
 }
